@@ -17,6 +17,7 @@ module PrometheusExporter::Metric
 
     def initialize(name, help)
       super
+      File.write('/tmp/drew.log', "Counter init for [#{name}]\n", mode: 'a+')
       reset!
     end
 
@@ -25,6 +26,7 @@ module PrometheusExporter::Metric
     end
 
     def reset!
+      File.write('/tmp/drew.log', "Counter reset! for [#{name}]\n", mode: 'a+')
       @data = {}
       @counter_warmup = {}
     end
@@ -41,29 +43,34 @@ module PrometheusExporter::Metric
     end
 
     def remove(labels)
+      File.write('/tmp/drew.log', "Counter remove for [#{name}] [#{labels.inspect}]\n", mode: 'a+')
       @counter_warmup.delete(labels)
       @data.delete(labels)
     end
 
     def observe(increment = 1, labels = {})
+      File.write('/tmp/drew.log', "Counter observe for [#{name}] [#{labels.inspect}]\n", mode: 'a+')
       warmup_counter(labels)
       @data[labels] ||= 0
       @data[labels] += increment
     end
 
     def increment(labels = {}, value = 1)
+      File.write('/tmp/drew.log', "Counter increment for [#{name}] [#{labels.inspect}]\n", mode: 'a+')
       warmup_counter(labels)
       @data[labels] ||= 0
       @data[labels] += value
     end
 
     def decrement(labels = {}, value = 1)
+      File.write('/tmp/drew.log', "Counter decrement for [#{name}] [#{labels.inspect}]\n", mode: 'a+')
       warmup_counter(labels)
       @data[labels] ||= 0
       @data[labels] -= value
     end
 
     def reset(labels = {}, value = 0)
+      File.write('/tmp/drew.log', "Counter reset for [#{name}] [#{labels.inspect}]\n", mode: 'a+')
       warmup_counter(labels)
       @data[labels] = value
     end
@@ -72,12 +79,15 @@ module PrometheusExporter::Metric
 
     def warmup_counter(labels)
       if Counter.counter_warmup && !@data.has_key?(labels)
+        File.write('/tmp/drew.log', "Counter warmup for [#{name}] #{labels.inspect} (#{@data.inspect}) (#{@data.object_id})\n", mode: 'a+')
         @counter_warmup[labels] = 0
       end
     end
 
     def warmup_counter_value(labels)
-      @counter_warmup.delete(labels) || @data[labels]
+      v = @counter_warmup.delete(labels) || @data[labels]
+      File.write('/tmp/drew.log', "Counter warmup value for [#{name}] #{labels.inspect}: (#{v}) (#{@counter_warmup.inspect}) (#{@data.inspect}) (#{@data.object_id})\n", mode: 'a+')
+      v
     end
   end
 end

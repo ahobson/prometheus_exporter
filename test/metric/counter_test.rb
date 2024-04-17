@@ -172,6 +172,24 @@ module PrometheusExporter::Metric
           a_counter{foo="bar"} 10
         TEXT
         assert_equal(counter.to_prometheus_text, text)
+
+        text = <<~TEXT
+          # HELP a_counter my amazing counter
+          # TYPE a_counter counter
+          a_counter{sam="ham"} 5
+          a_counter{foo="bar"} 10
+        TEXT
+        assert_equal(counter.to_prometheus_text, text)
+
+        counter.increment(sam: "ham")
+        counter.increment(foo: "bar")
+        text = <<~TEXT
+          # HELP a_counter my amazing counter
+          # TYPE a_counter counter
+          a_counter{sam="ham"} 6
+          a_counter{foo="bar"} 11
+        TEXT
+        assert_equal(counter.to_prometheus_text, text)
       end
     end
   end

@@ -36,10 +36,13 @@ module PrometheusExporter::Server
 
     def process_hash(obj)
       @mutex.synchronize do
+        File.write('/tmp/drew.log', "process_hash for [#{obj.inspect}]\n", mode: 'a+')
         if collector = @collectors[obj["type"]]
+          File.write('/tmp/drew.log', "process_hash collector [#{collector.inspect}]\n", mode: 'a+')
           collector.collect(obj)
         else
           metric = @metrics[obj["name"]]
+          File.write('/tmp/drew.log', "process_hash initial metric [#{metric.inspect}]\n", mode: 'a+')
           if !metric
             metric = register_metric_unsafe(obj)
           end

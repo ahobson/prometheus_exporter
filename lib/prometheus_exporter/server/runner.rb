@@ -28,6 +28,7 @@ module PrometheusExporter::Server
       PrometheusExporter::Metric::Base.default_prefix = prefix
       PrometheusExporter::Metric::Base.default_labels = label
       PrometheusExporter::Metric::Counter.counter_warmup = counter_warmup
+      STDERR.puts "Counter Warmup Enabled" if counter_warmup
 
       if histogram
         PrometheusExporter::Metric::Base.default_aggregation = PrometheusExporter::Metric::Histogram
